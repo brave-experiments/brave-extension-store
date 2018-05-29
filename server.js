@@ -11,9 +11,9 @@ const server=Hapi.server({
 // Add the route
 server.route({
     method:'GET',
-    path:'/extension-store',
+    path:'/brave-extension-store',
     handler:function(request,h) {
-        return request.params.extensions_mock.html;
+        return request.params.extensions.html;
     }
 });
 
