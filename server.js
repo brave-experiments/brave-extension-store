@@ -1,6 +1,7 @@
 'use strict';
 
 const Hapi=require('hapi');
+const fs = require('fs')
 
 // Create a server with a host and port
 const server=Hapi.server({
@@ -8,16 +9,15 @@ const server=Hapi.server({
     port:8000
 });
 
-const extensions = [
-    {
-        name: '1Password',
-        extensionId: 'aomjjhallfgjeglblehebfpbcfeobpgk'
-    },
-    {
-        name: 'LastPass',
-        extensionId: 'hdokiejnpimakedhajhdlcegeplioahd'
-    }
-]
+let extensions = []
+
+fs.readFile('./src/extensionManifest.json', (err, data) => {
+  if (err) throw err;
+
+  extensions = JSON.parse(data)
+
+  console.log(data);
+});
 
 // API: define routes
 server.route({
@@ -50,18 +50,29 @@ async function start() {
             method: 'GET',
             path: '/store',
             handler: (request, h) => {
-                return h.file('./src/store.html');
+                return h.file('./src/storeList.html');
             }
         });
 
+        //
+        server.route({
+            method: 'GET',
+            path: '/{param*}',
+            handler: {
+                directory: {
+                    path: 'src'
+                }
+            }
+        });
+        console.log('start1')
         await server.start();
+        console.log('start2')
     }
     catch (err) {
         console.log(err);
         process.exit(1);
     }
-
     console.log('Server running at:', server.info.uri);
-};
+}
 
-start();
+start()

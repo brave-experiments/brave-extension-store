@@ -15,7 +15,7 @@
                if (xmlhttp.status == 200) {
                   const response = JSON.parse(xmlhttp.response)
                   response.extensions.forEach((extension) => {
-                    document.getElementById("extensions").innerHTML += extension
+                    document.getElementById("name").innerHTML += extension
                   })
                } else {
                   console.log('Request returned ' + xmlhttp.status)
