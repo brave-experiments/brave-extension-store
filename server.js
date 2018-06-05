@@ -11,19 +11,13 @@ const server=Hapi.server({
 
 let extensions = []
 
-fs.readFile('./src/extensionManifest.json', (err, data) => {
-  if (err) throw err;
-
-  extensions = JSON.parse(data)
-
-  console.log(data);
-});
-
 // API: define routes
 server.route({
     method:'GET',
     path:'/brave-extension-store',
     handler:function(request, h) {
+        const response = fs.readFileSync('./src/extensionManifest.json')
+        extensions = JSON.parse(response)
         return {
             extensions: extensions
         }
@@ -37,6 +31,19 @@ server.route({
         return extensions.find((extension) => {
             return extension.extensionId === request.params.extensionId
         })
+    }
+});
+
+server.route({
+    method:'GET',
+    path:'/brave-extension-store-update',
+    handler:function(request, h) {
+        try{
+            var update = require('./src/updateExtension')
+            return update.updateExt()
+        } catch (e) {
+            console.log('Error during `brave-extension-store-update`: ', e)
+        }
     }
 });
 

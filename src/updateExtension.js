@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -28,33 +26,35 @@ const fs = require('fs')
 const crypto = require('crypto')
 const path = require('path')
 const xmldoc = require('xmldoc')
-const args = require('yargs')
-    .usage('node $0 --chromium=X.X.X.X [--download] [--upload] [--server=<server>] [--v=<v>] [--id=<componentId> --path=<path> --version=<version>]')
-    .demand(['chromium', 'location'])
-    // Whether or not to download from the chromium server when it is outdated
-    .default('download', false)
-    // Whether or not to upload to brave's s3 when it is downloaded (download is implied)
-    .default('upload', false)
-    // Only brave is treated as a special value
-    .default('server', 'google')
-    // Default log level to 1
-    .default('v', 1)
-    .argv
+// const args = require('yargs')
+//     .usage('node $0 --chromium=X.X.X.X [--download] [--upload] [--server=<server>] [--v=<v>] [--id=<componentId> --path=<path> --version=<version>]')
+//     .demand(['chromium', 'location'])
+//     // Whether or not to download from the chromium server when it is outdated
+//     .default('download', false)
+//     // Whether or not to upload to brave's s3 when it is downloaded (download is implied)
+//     .default('upload', false)
+//     // Only brave is treated as a special value
+//     .default('server', 'google')
+//     // Default log level to 1
+//     .default('v', 1)
+//     .argv
+
+const args = {
+  location: './src/'
+}
 
 const googleUpdateServerBaseUrl = 'https://clients2.google.com/service/update2'
 const braveUpdateServerBaseUrl = 'https://laptop-updates.brave.com/extensions'
 const localUpdateServerBaseUrl = 'http://localhost:8192/extensions'
 const widevineComponentId = 'oimompecagnajdejgnnjijobebaeigek'
 
-const common = require('../src/common')
-
 const S3_EXTENSIONS_BUCKET = process.env.S3_EXTENSIONS_BUCKET || 'brave-extensions'
 
-const extensionManifestPath = path.join(args.location, 'stable', 'extensions', 'extensionManifest.json')
+const extensionManifestPath = path.join(args.location, 'extensionManifest.json')
 
 // check that the Manifest exists
 if (!fs.existsSync(extensionManifestPath)) {
-  throw new Error("Manifest does not exist within " + args.location)
+  throw new Error("Manifest does not exist at " + args.location)
 }
 
 // I'm not sure how we'll organize this in the future, but for now just pass along static data
@@ -82,9 +82,16 @@ const getResponseComponents = (responseXML) => {
     return undefined
   }
   const extensions = doc.childrenNamed('app')
-        .map((app) => {
-          return [app.attr.appid, app.descendantWithPath('updatecheck.manifest').attr.version, app.descendantWithPath('updatecheck.manifest.packages.package').attr.hash_sha256]
-        })
+    .map((app) => {
+      const updatecheckManifest = app.descendantWithPath('updatecheck.manifest')
+      const updatecheckManifestPackages = app.descendantWithPath('updatecheck.manifest.packages.package')
+
+      return [
+        app.attr.appid,
+        updatecheckManifest && updatecheckManifest.attr.version,
+        updatecheckManifestPackages && updatecheckManifestPackages.attr.hash_sha256
+      ]
+    })
   return extensions
 }
 
@@ -98,7 +105,9 @@ const getExtensionServerBaseURL = () => {
   return googleUpdateServerBaseUrl
 }
 
-const vlog = common.makeVlog(args.v)
+const vlog = (arg1, arg2) => {
+  console.log(arg1, arg2)
+}
 
 vlog(1, 'Using server:', getExtensionServerBaseURL())
 vlog(1, 'Using S3 bucket:', S3_EXTENSIONS_BUCKET)
@@ -185,95 +194,107 @@ const uploadFile = (filePath, componentId, componentFilename) => {
 }
 
 const writeExtensionsManifest = (componentData) =>
-  fs.writeFileSync(extensionManifestPath, JSON.stringify(componentData, null, 2) + '\n')
+    fs.writeFileSync(extensionManifestPath, JSON.stringify(componentData, null, 2) + '\n')
 
 // Check if we're only uploading an individual extension
-const updateExt = () = {
-    if (args.id && args.path && args.version) {
-      const braveExtensions = readExtensions()
-      const braveExtension = braveExtensions.find(([braveComponentId]) => braveComponentId === args.id)
-      if (!braveExtension) {
-        vlog(1, `Could not find component ID: ${braveComponentId}`)
-        process.exit(1)
-      }
-      const filename = `extension_${args.version.replace(/\./g,'_')}.crx`
-      uploadFile(args.path, args.id, filename)
-          .then(getSHA.bind(null, args.path))
-          .then((sha) => {
-            braveExtension[1] = args.version
-            braveExtension[2] = sha
-          })
-          .then(writeExtensionsManifest.bind(null, braveExtensions))
-          .then(process.exit.bind(null, 0))
-          .catch(process.exit.bind(null, 1))
-    } else {
-      request.post({
-        url: getExtensionServerBaseURL(),
-        body: body,
-        headers: {
-          'Content-Type': 'application/xml'
-        }
-      }, function optionalCallback (err, httpResponse, body) {
-        if (err) {
-          return console.error('failed:', err)
-        }
+module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download, upload) => {
+  args.id = extensionId
+  args.path = uploadPath
+  args.version = extensionVersion
+  args.download = download
+  args.upload = upload
 
-        vlog(2, 'Response body:', body)
-        let responseComponents = getResponseComponents(body)
-          .filter(([componentId]) => !args.id || componentId === args.id)
-        if (responseComponents.length === 0) {
-          console.error('No component information returned')
-        }
-
-        vlog(1, 'Checked components:\n---------------------')
-        vlog(1, `${braveComponents.map((extension) => extension[3]).join(', ')}\n`)
-
-        // Add in the Brave info for each component
-        vlog(1, 'Outdated components:\n--------------------')
-        vlog(1, responseComponents.map((component) => [...component, ...braveComponents.find((braveComponent) => braveComponent[0] === component[0])])
-          .map((component) => [...component, ...braveComponents.find((braveComponent) => braveComponent[0] === component[0])])
-          // Filter out components with the same Brave versions as Google version
-          .filter((component) => component[1] !== component[4])
-          // And reduce to a string that we print out
-          .reduce((result, [componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => result + `Component: ${componentName} (${componentId})\nChrome store: ${chromeVersion}\nBrave store: ${braveVersion}\nSHA 256: ${chromeSHA256}\n\n`, ''))
-
-        // Widevine components should not be attempted to be downloaded or uploaded, it is just for getting the version.
-        // If you try it will just throw an error.
-        responseComponents = getResponseComponents(body)
-          .filter(([componentId]) => componentId !== widevineComponentId)
-
-        if (args.download || args.upload) {
-          mkdir('out')
-          vlog(1, 'Downloading...')
-          responseComponents.forEach(([componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => {
-            const dir = path.join('out', componentId)
-            const filename = `extension_${chromeVersion.replace(/\./g,'_')}.crx`
-            mkdir(dir)
-            const outputPath = path.join(dir, filename)
-            var file = fs.createWriteStream(outputPath)
-            const url = `${getExtensionServerBaseURL()}/crx?response=redirect&prodversion=${args.chromium}&x=id%3D${componentId}%26uc`
-            request(url)
-              .pipe(fs.createWriteStream(outputPath))
-              .on('finish', function () {
-                vlog(1, `Downloaded ${outputPath} from Google's server`)
-                if (args.upload) {
-                  verifyFileSHA(outputPath, chromeSHA256)
-                    .then(uploadFile.bind(null, outputPath, componentId, filename))
-                    .then(() => vlog(1, `Uploaded ${outputPath} to s3`))
-                }
-              });
-          })
-          writeExtensionsManifest(
-            readExtensions().map(([braveComponentId, braveVersion, braveSHA256, braveComponentName]) => {
-              const chromeComponent = responseComponents.find((chromeComponent) => braveComponentId === chromeComponent[0])
-              return [
-                braveComponentId,
-                chromeComponent ? chromeComponent[1] : braveVersion,
-                chromeComponent ? chromeComponent[2] : braveSHA256,
-                braveComponentName
-              ]
-            }))
-        }
-      })
+  if (args.id && args.path && args.version) {
+    // UPLOAD SINGLE extension
+    const braveExtensions = readExtensions()
+    const braveExtension = braveExtensions.find(([braveComponentId]) => braveComponentId === args.id)
+    if (!braveExtension) {
+      vlog(1, `Could not find component ID: ${braveComponentId}`)
+      process.exit(1)
     }
+    const filename = `extension_${args.version.replace(/\./g,'_')}.crx`
+    uploadFile(args.path, args.id, filename)
+        .then(getSHA.bind(null, args.path))
+        .then((sha) => {
+          braveExtension[1] = args.version
+          braveExtension[2] = sha
+        })
+        .then(writeExtensionsManifest.bind(null, braveExtensions))
+        .then(process.exit.bind(null, 0))
+        .catch(process.exit.bind(null, 1))
+  } else {
+    // update ALL extensions
+    request.post({
+      url: getExtensionServerBaseURL(),
+      body: body,
+      headers: {
+        'Content-Type': 'application/xml'
+      }
+    }, function optionalCallback (err, httpResponse, body) {
+      if (err) {
+        return console.error('failed:', err)
+      }
+
+      vlog(2, 'Response body:', body)
+      let responseComponents = getResponseComponents(body)
+        .filter(([componentId]) => !args.id || componentId === args.id)
+      if (responseComponents.length === 0) {
+        console.error('No component information returned')
+      }
+
+      vlog(1, 'Checked components:\n---------------------')
+      vlog(1, `${braveComponents.map((extension) => extension[3]).join(', ')}\n`)
+
+      // Add in the Brave info for each component
+      vlog(1, 'Outdated components:\n--------------------')
+      vlog(1, responseComponents.map((component) => [...component, ...braveComponents.find((braveComponent) => braveComponent[0] === component[0])])
+        .map((component) => [...component, ...braveComponents.find((braveComponent) => braveComponent[0] === component[0])])
+        // Filter out components with the same Brave versions as Google version
+        .filter((component) => component[1] !== component[4])
+        // And reduce to a string that we print out
+        .reduce((result, [componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => result + `Component: ${componentName} (${componentId})\nChrome store: ${chromeVersion}\nBrave store: ${braveVersion}\nSHA 256: ${chromeSHA256}\n\n`, ''))
+
+
+      // Widevine components should not be attempted to be downloaded or uploaded, it is just for getting the version.
+      // If you try it will just throw an error.
+      responseComponents = getResponseComponents(body)
+        .filter(([componentId]) => componentId !== widevineComponentId)
+
+
+      if (args.download || args.upload) {
+        mkdir('out')
+        vlog(1, 'Downloading...')
+        responseComponents.forEach(([componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => {
+          const dir = path.join('out', componentId)
+          const filename = `extension_${chromeVersion.replace(/\./g,'_')}.crx`
+          mkdir(dir)
+          const outputPath = path.join(dir, filename)
+          var file = fs.createWriteStream(outputPath)
+          const url = `${getExtensionServerBaseURL()}/crx?response=redirect&prodversion=${args.chromium}&x=id%3D${componentId}%26uc`
+          request(url)
+            .pipe(fs.createWriteStream(outputPath))
+            .on('finish', function () {
+              vlog(1, `Downloaded ${outputPath} from Google's server`)
+              if (args.upload) {
+                verifyFileSHA(outputPath, chromeSHA256)
+                  .then(uploadFile.bind(null, outputPath, componentId, filename))
+                  .then(() => vlog(1, `Uploaded ${outputPath} to s3`))
+              }
+            });
+        })
+        writeExtensionsManifest(
+          readExtensions().map(([braveComponentId, braveVersion, braveSHA256, braveComponentName]) => {
+            const chromeComponent = responseComponents.find((chromeComponent) => braveComponentId === chromeComponent[0])
+            return [
+              braveComponentId,
+              chromeComponent ? chromeComponent[1] : braveVersion,
+              chromeComponent ? chromeComponent[2] : braveSHA256,
+              braveComponentName
+            ]
+          }))
+      }
+    })
+  }
+
+  return 'updated!'
 }
