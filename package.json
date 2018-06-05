@@ -9,6 +9,7 @@
   "author": "Ailin Liao",
   "license": "ISC",
   "dependencies": {
+    "brave-ui": "^0.10.3",
     "hapi": "^17.5.0",
     "inert": "^5.1.0",
     "sqlite3": "^3.1.13"

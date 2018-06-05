@@ -1,10 +1,47 @@
-<html>
+<!doctype html>
+<html dir="$i18n{textdirection}" lang="$i18n{language}"
+    class="loading $i18n{loadTimeClasses}">
+    <head>
+      <meta charset="utf8">
+      <title>Brave Extension Store</title>
+    <if expr="not optimize_webui">
+      <base href="about://extensions">
+    </if>
+      <style>
+        html {
+          /* --md-background-color in disguise. Not using the var for increased
+           * performance. */
+          background-color: #f1f1f1;
 
-  <body>
+          /* Remove 300ms delay for 'click' event, when using touch interface. */
+          touch-action: manipulation;
+        }
+
+        .loading {
+          /* Brave, orange, and beautiful. */
+          border-top: 56px solid rgb(252,83,44);
+
+        }
+
+        /* Note: .in-dev-mode is applied by i18n{loadTimeClasses}. */
+        .loading.in-dev-mode {
+          border-top-width: 96px;
+        }
+
+        html,
+        body {
+          height: 100%;
+          line-height: 154%;
+          margin: 0;
+          overflow: hidden;
+          width: 100%;
+        }
+      </style>
+    </head>
+<body>
     <h1>Extensions</h1>
     <div id="extensions">
     </div>
-  </body>
-
-  <script src="storeList.js"></script>
+</body>
+<script src="storeList.js"></script>
 </html>

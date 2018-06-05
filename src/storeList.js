@@ -18,9 +18,21 @@ function fetchExtensions() {
     xmlhttp.open('GET', '/brave-extension-store', true)
     xmlhttp.send()
 }
-/*function checkForUpdates () {
-    //.
-    xmlhttp.open('GET', '/brave-extension-store-update', true)
+
+function checkForUpdates () {
+    var update = require('./src/updateExtension.js')
+    update.updateExt()
+    //xmlhttp.open('GET', '/brave-extension-store-update', true)
 }
-*/
+
+const { PushButton } = require('brave-ui')
+render () {
+    return (
+        <PushButton theme='primary' label='Update Extensions' onClick={
+            checkForUpdates()
+        }>
+        </PushButton>
+    )
+}
+
 fetchExtensions()

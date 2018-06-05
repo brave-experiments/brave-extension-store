@@ -64,9 +64,8 @@ async function start() {
                 }
             }
         });
-        console.log('start1')
+        // DEBUG: console.log('start1')
         await server.start();
-        console.log('start2')
     }
     catch (err) {
         console.log(err);
