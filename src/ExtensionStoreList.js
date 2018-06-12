@@ -2,6 +2,7 @@
 
 const React = require('react')
 const { PushButton } = require('brave-ui')
+const ExtensionStoreItem = require('./ExtensionStoreItem')
 
 class ExtensionStoreList extends React.Component {
   constructor (props) {
@@ -65,7 +66,9 @@ class ExtensionStoreList extends React.Component {
       <div id="extensions">
         {
           this.state.extensions.map((extension) => {
-            return <div>{extension[0]}</div>
+            return <ExtensionStoreItem
+              id={extension[0]}
+              />
           })
         }
       </div>
