@@ -3,7 +3,7 @@
 const React = require('react')
 const { PushButton } = require('brave-ui')
 
-class ExtensionStoreList extends React.Component {
+class ExtensionStoreItem extends React.Component {
   constructor (props) {
     super()
     this.state = {
@@ -19,4 +19,4 @@ class ExtensionStoreList extends React.Component {
   }
 }
 
-module.exports = ExtensionStoreList
+module.exports = ExtensionStoreItem
