@@ -1,3 +1,5 @@
+/* global XMLHttpRequest */
+
 'use strict'
 
 const React = require('react')
@@ -23,9 +25,9 @@ class ExtensionStoreList extends React.Component {
     var xmlhttp = new XMLHttpRequest()
     const self = this
 
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-        if (xmlhttp.status == 200) {
+    xmlhttp.onreadystatechange = function () {
+      if (xmlhttp.readyState === XMLHttpRequest.DONE) {
+        if (xmlhttp.status === 200) {
           const response = JSON.parse(xmlhttp.response)
           const extensions = []
 
@@ -48,12 +50,13 @@ class ExtensionStoreList extends React.Component {
   }
 
   checkForUpdates () {
-    var xmlhttp = new XMLHttpRequest();
+    var xmlhttp = new XMLHttpRequest()
+    const self = this
 
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-        if (xmlhttp.status == 200) {
-          document.getElementById("messages").innerHTML = xmlhttp.response
+    xmlhttp.onreadystatechange = function () {
+      if (xmlhttp.readyState === XMLHttpRequest.DONE) {
+        if (xmlhttp.status === 200) {
+          document.getElementById('messages').innerHTML = xmlhttp.response
           // TODO: this.setState()
           // ex: this.setState('extensions', xmlhtml)
           self.setState({loading: false})
@@ -88,21 +91,21 @@ class ExtensionStoreList extends React.Component {
       <TitleHeading
         text='Brave Extension Store'
         label='beta'
-        />
+      />
 
-      <div id="extensions">
-      {
-        this.state.loading
-          ? <div><img src={spinnerImage} /> Loading...</div>
-          : this.state.extensions.map((extension) => {
+      <div id='extensions'>
+        {
+          this.state.loading
+            ? <div><img src={spinnerImage} /> Loading...</div>
+            : this.state.extensions.map((extension) => {
               return <ExtensionStoreItem
                 id={extension[0]}
                 version={extension[1]}
                 sha={extension[2]}
                 name={extension[3]}
-                />
+              />
             })
-      }
+        }
       </div>
 
       <div style={bottomStyle}>
@@ -114,7 +117,7 @@ class ExtensionStoreList extends React.Component {
           Check for updates
         </PushButton>
 
-        <div id="messages"></div>
+        <div id='messages' />
       </div>
     </div>
   }

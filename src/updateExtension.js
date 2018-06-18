@@ -54,7 +54,7 @@ const extensionManifestPath = path.join(args.location, 'extensionManifest.json')
 
 // check that the Manifest exists
 if (!fs.existsSync(extensionManifestPath)) {
-  throw new Error("Manifest does not exist at " + args.location)
+  throw new Error('Manifest does not exist at ' + args.location)
 }
 
 // I'm not sure how we'll organize this in the future, but for now just pass along static data
@@ -148,7 +148,7 @@ const getSHA = (filePath) => {
   return new Promise((resolve) => {
     var s = fs.ReadStream(filePath)
     const checksum = crypto.createHash('sha256')
-    s.on('data', function (d) { checksum.update(d); });
+    s.on('data', function (d) { checksum.update(d) })
     s.on('end', function () {
       resolve(checksum.digest('hex'))
     })
@@ -163,7 +163,7 @@ const verifyFileSHA = (filePath, expectedSHA256) => {
         resolve()
       } else {
         console.error('Bad SHA56:', calculatedSHA256, ', expected: ', expectedSHA256)
-        reject('mismatch')
+        reject(new Error('mismatch'))
       }
     })
   })
@@ -185,7 +185,7 @@ const uploadFile = (filePath, componentId, componentFilename) => {
     const uploader = client.uploadFile(params)
     uploader.on('error', function (err) {
       console.error('Unable to upload:', err.stack, 'Do you have ~/.aws/credentials filled out?')
-      reject()
+      reject(new Error('credentials'))
     })
     uploader.on('end', function (params) {
       resolve()
@@ -194,7 +194,7 @@ const uploadFile = (filePath, componentId, componentFilename) => {
 }
 
 const writeExtensionsManifest = (componentData) =>
-    fs.writeFileSync(extensionManifestPath, JSON.stringify(componentData, null, 2) + '\n')
+  fs.writeFileSync(extensionManifestPath, JSON.stringify(componentData, null, 2) + '\n')
 
 // Check if we're only uploading an individual extension
 module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download, upload) => {
@@ -209,19 +209,19 @@ module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download,
     const braveExtensions = readExtensions()
     const braveExtension = braveExtensions.find(([braveComponentId]) => braveComponentId === args.id)
     if (!braveExtension) {
-      vlog(1, `Could not find component ID: ${braveComponentId}`)
+      vlog(1, `Could not find component ID: ${extensionId}`)
       process.exit(1)
     }
-    const filename = `extension_${args.version.replace(/\./g,'_')}.crx`
+    const filename = `extension_${args.version.replace(/\./g, '_')}.crx`
     uploadFile(args.path, args.id, filename)
-        .then(getSHA.bind(null, args.path))
-        .then((sha) => {
-          braveExtension[1] = args.version
-          braveExtension[2] = sha
-        })
-        .then(writeExtensionsManifest.bind(null, braveExtensions))
-        .then(process.exit.bind(null, 0))
-        .catch(process.exit.bind(null, 1))
+      .then(getSHA.bind(null, args.path))
+      .then((sha) => {
+        braveExtension[1] = args.version
+        braveExtension[2] = sha
+      })
+      .then(writeExtensionsManifest.bind(null, braveExtensions))
+      .then(process.exit.bind(null, 0))
+      .catch(process.exit.bind(null, 1))
   } else {
     // update ALL extensions
     request.post({
@@ -254,22 +254,21 @@ module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download,
         // And reduce to a string that we print out
         .reduce((result, [componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => result + `Component: ${componentName} (${componentId})\nChrome store: ${chromeVersion}\nBrave store: ${braveVersion}\nSHA 256: ${chromeSHA256}\n\n`, ''))
 
-
       // Widevine components should not be attempted to be downloaded or uploaded, it is just for getting the version.
       // If you try it will just throw an error.
       responseComponents = getResponseComponents(body)
         .filter(([componentId]) => componentId !== widevineComponentId)
-
 
       if (args.download || args.upload) {
         mkdir('out')
         vlog(1, 'Downloading...')
         responseComponents.forEach(([componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => {
           const dir = path.join('out', componentId)
-          const filename = `extension_${chromeVersion.replace(/\./g,'_')}.crx`
+          const filename = `extension_${chromeVersion.replace(/\./g, '_')}.crx`
           mkdir(dir)
           const outputPath = path.join(dir, filename)
-          var file = fs.createWriteStream(outputPath)
+          // TODO: this is assigned, but never used. Does this work?
+          // var file = fs.createWriteStream(outputPath)
           const url = `${getExtensionServerBaseURL()}/crx?response=redirect&prodversion=${args.chromium}&x=id%3D${componentId}%26uc`
           request(url)
             .pipe(fs.createWriteStream(outputPath))
@@ -280,7 +279,7 @@ module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download,
                   .then(uploadFile.bind(null, outputPath, componentId, filename))
                   .then(() => vlog(1, `Uploaded ${outputPath} to s3`))
               }
-            });
+            })
         })
         writeExtensionsManifest(
           readExtensions().map(([braveComponentId, braveVersion, braveSHA256, braveComponentName]) => {
