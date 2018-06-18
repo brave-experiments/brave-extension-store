@@ -4,26 +4,6 @@
       <meta charset="utf8">
       <title>Brave Extension Store</title>
       <style>
-        html {
-          /* --md-background-color in disguise. Not using the var for increased
-           * performance. */
-          background-color: #f1f1f1;
-
-          /* Remove 300ms delay for 'click' event, when using touch interface. */
-          touch-action: manipulation;
-        }
-
-        .loading {
-          /* Brave, orange, and beautiful. */
-          border-top: 56px solid rgb(252,83,44);
-
-        }
-
-        /* Note: .in-dev-mode is applied by i18n{loadTimeClasses}. */
-        .loading.in-dev-mode {
-          border-top-width: 96px;
-        }
-
         html,
         body {
           height: 100%;
@@ -31,6 +11,9 @@
           margin: 0;
           overflow: hidden;
           width: 100%;
+        }
+        #root {
+          text-align: center;
         }
       </style>
     </head>
