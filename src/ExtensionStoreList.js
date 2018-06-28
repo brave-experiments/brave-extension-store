@@ -73,6 +73,10 @@ class ExtensionStoreList extends React.Component {
   }
 
   render () {
+    const backStyle = {
+      borderTop: '56px',
+      borderTopColor: 'solid rgb(51, 103, 214)'
+    }
     const rootStyle = {
       backgroundColor: '#f1f1f1',
       width: '1200px',
@@ -81,13 +85,14 @@ class ExtensionStoreList extends React.Component {
       textAlign: 'left',
       borderLeft: '1px solid black',
       borderRight: '1px solid black',
-      padding: '5px'
+      padding: '10px'
     }
     const bottomStyle = {
       marginTop: '10px'
     }
 
     return <div style={rootStyle}>
+      <div style={backStyle}/> 
       <TitleHeading
         text='Brave Extension Store'
         label='beta'

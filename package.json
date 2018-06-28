@@ -15,7 +15,9 @@
   "dependencies": {
     "brave-ui": "^0.10.3",
     "hapi": "^17.5.0",
+    "https": "^1.0.0",
     "inert": "^5.1.0",
+    "lint": "^1.1.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "request": "^2.87.0",

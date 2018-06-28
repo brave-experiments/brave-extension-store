@@ -3,10 +3,16 @@
 const Hapi = require('hapi')
 const fs = require('fs')
 
+var certOptions = {
+  key: fs.readFileSync('./ext.key'),
+  cert: fs.readFileSync('./ext.crt')
+}
+
 // Create a server with a host and port
 const server = Hapi.server({
   host: 'localhost',
-  port: 8000
+  port: 8000,
+  tls: certOptions
 })
 
 let extensions = []

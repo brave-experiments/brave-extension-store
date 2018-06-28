@@ -15,6 +15,19 @@ class ExtensionStoreItem extends React.Component {
 
   install () {
     console.log('install for ' + this.props.name + ' clicked')
+    if (chrome.app.isInstalled) {
+      console.log('Already Installed!')
+    } else {
+      //var webstoreURL = 'https://chrome.google.com/webstore/detail/' + id
+      chrome.webstore.install(
+        'https://chrome.google.com/webstore/detail/' + this.props.id,
+        function () {
+          console.log('Installed.')
+        }, function () {
+          console.log('ERROR!')
+        }
+      )
+    }
   }
 
   render () {
@@ -24,7 +37,7 @@ class ExtensionStoreItem extends React.Component {
       marginRight: '10px',
       border: '1px solid black',
       minWidth: '150px',
-      minHeight: '60px',
+      minHeight: '70px',
       textAlign: 'center'
     }
 
@@ -32,7 +45,7 @@ class ExtensionStoreItem extends React.Component {
       <div>{this.props.name}</div>
       <div>Version {this.props.version}</div>
       <PushButton onClick={this.install}>Install</PushButton>
-    </div>
+      </div>
   }
 }
 
