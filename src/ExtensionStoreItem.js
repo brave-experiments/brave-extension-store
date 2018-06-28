@@ -18,7 +18,6 @@ class ExtensionStoreItem extends React.Component {
     if (chrome.app.isInstalled) {
       console.log('Already Installed!')
     } else {
-      //var webstoreURL = 'https://chrome.google.com/webstore/detail/' + id
       chrome.webstore.install(
         'https://chrome.google.com/webstore/detail/' + this.props.id,
         function () {
