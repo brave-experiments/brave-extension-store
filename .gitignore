@@ -2,3 +2,6 @@ node_modules
 dist
 src/storeList.bundle.js
 .DS_Store
+ca.crt
+ca.key
+ca.srl
