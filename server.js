@@ -3,13 +3,41 @@
 const Hapi = require('hapi')
 const fs = require('fs')
 
+var certOptions = {
+  key: fs.readFileSync('./server-example.key'),
+  cert: fs.readFileSync('./server-example.crt')
+}
+
 // Create a server with a host and port
 const server = Hapi.server({
-  host: 'localhost',
-  port: 8000
+  host: 'example.com',
+  port: 443,
+  tls: certOptions
 })
 
+// Creating remote proxies for chrome.google.com to example.com
+var remotes = {
+  url: "https://chrome.google.com",
+  path: 'webstore/category/extensions'
+}
+
 let extensions = []
+
+
+server.route({
+  method: '*',
+  path: '/' + remotes.path + '/{params*}',
+  handler: {
+    proxy: {
+      mapUri: function(request, callback) {
+        var url = remotes.url + "/" + request.url.href.replace('/' + remotes.path + '/', '')
+        callback(null, url)
+      },
+      pathThrough: true,
+      xforward: true
+    }
+  }
+})
 
 // API: define routes
 server.route({
@@ -51,7 +79,7 @@ server.route({
 async function start () {
   try {
     await server.register(require('inert'))
-
+    await server.register(require('h2o2'))
     // Static content
     server.route({
       method: 'GET',
