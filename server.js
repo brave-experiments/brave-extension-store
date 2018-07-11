@@ -18,7 +18,7 @@ const server = Hapi.server({
 // Creating remote proxies for chrome.google.com to example.com
 var remotes = {
   url: 'https://chrome.google.com',
-  path: 'webstore/category/extensions'
+  path: 'webstore/detail'
 }
 
 let extensions = []
@@ -72,25 +72,28 @@ async function start () {
       }
     })
 
-    //
-    server.route({
-      method: 'GET',
-      path: '/{param*}',
-      handler: {
-        directory: {
-          path: 'src'
-        }
-      }
-    })
+    // TODO: add this back, after fixing the proxy code
+    // it may need to move down below the next route, since specifying `/*` might be too general
+    // server.route({
+    //   method: 'GET',
+    //   path: '/{param*}',
+    //   handler: {
+    //     directory: {
+    //       path: 'src'
+    //     }
+    //   }
+    // })
 
     server.route({
       method: '*',
       path: '/' + remotes.path + '/{params*}',
       handler: {
         proxy: {
-          mapUri: function(request, callback) {
-            var url = remotes.url + "/" + request.url.href.replace('/' + remotes.path + '/', '')
-            callback(null, url)
+          mapUri: function (request, callback) {
+            const extensionId = request.url.href.replace('/' + remotes.path + '/', '')
+            const url = remotes.url + '/' + remotes.path + '/' + extensionId
+            console.log('BSC]] returning ', url)
+            return url
           },
           passThrough: true,
           xforward: true
