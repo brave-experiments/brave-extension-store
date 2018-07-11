@@ -93,7 +93,9 @@ async function start () {
             const extensionId = request.url.href.replace('/' + remotes.path + '/', '')
             const url = remotes.url + '/' + remotes.path + '/' + extensionId
             console.log('BSC]] returning ', url)
-            return url
+            return {
+              uri: url
+            }
           },
           passThrough: true,
           xforward: true
