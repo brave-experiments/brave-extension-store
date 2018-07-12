@@ -15,12 +15,6 @@ const server = Hapi.server({
   tls: certOptions
 })
 
-// Creating remote proxies for chrome.google.com to example.com
-var remotes = {
-  url: 'https://chrome.google.com',
-  path: 'webstore/detail'
-}
-
 let extensions = []
 
 // API: define routes
@@ -59,7 +53,6 @@ server.route({
   }
 })
 
-// Start the server
 async function start () {
   try {
     await server.register([require('inert'), require('h2o2')])
@@ -72,18 +65,11 @@ async function start () {
       }
     })
 
-    // TODO: add this back, after fixing the proxy code
-    // it may need to move down below the next route, since specifying `/*` might be too general
-    // server.route({
-    //   method: 'GET',
-    //   path: '/{param*}',
-    //   handler: {
-    //     directory: {
-    //       path: 'src'
-    //     }
-    //   }
-    // })
-
+    // Proxy requests for extension installs to Chrome Web Store
+    const remotes = {
+      url: 'https://chrome.google.com',
+      path: 'webstore/detail'
+    }
     server.route({
       method: '*',
       path: '/' + remotes.path + '/{params*}',
@@ -92,17 +78,36 @@ async function start () {
           mapUri: function (request, callback) {
             const extensionId = request.url.href.replace('/' + remotes.path + '/', '')
             const url = remotes.url + '/' + remotes.path + '/' + extensionId
-            console.log('BSC]] returning ', url)
             return {
               uri: url
             }
           },
-          passThrough: true,
-          xforward: true
+          redirects: 3
         }
       }
     })
-    // DEBUG: console.log('start1')
+
+    // used for static content (ex: images, JavaScript, etc)
+    server.route({
+      method: 'GET',
+      path: '/store/{param*}',
+      handler: {
+        directory: {
+          path: 'src'
+        }
+      }
+    })
+    // images packed with webpack
+    server.route({
+      method: 'GET',
+      path: '/public/{param*}',
+      handler: {
+        directory: {
+          path: 'src/public'
+        }
+      }
+    })
+
     await server.start()
   } catch (err) {
     console.log(err)
