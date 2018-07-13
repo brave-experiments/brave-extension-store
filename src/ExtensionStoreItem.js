@@ -22,8 +22,8 @@ class ExtensionStoreItem extends React.Component {
         'https://example.com/webstore/detail/' + this.props.id,
         function () {
           console.log('Installed.')
-        }, function () {
-          console.log('ERROR!')
+        }, function (errorText) {
+          console.log('ERROR!\n' + errorText)
         }
       )
     }
