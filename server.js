@@ -10,9 +10,8 @@ var certOptions = {
 
 // Create a server with a host and port
 const server = Hapi.server({
-  host: 'example.com',
-  port: 443,
-  tls: certOptions
+  host: '127.0.0.1',
+  port: 8080,
 })
 
 let extensions = []
