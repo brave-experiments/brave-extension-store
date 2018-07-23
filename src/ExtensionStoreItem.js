@@ -13,6 +13,15 @@ class ExtensionStoreItem extends React.Component {
     this.install = this.install.bind(this)
   }
 
+  uninstall () {
+    console.log('uninstall for ' + this.props.name + ' clicked')
+    if (!chrome.app.isInstalled) {
+      console.log('Already Uninstalled!')
+    } else {
+      console.log(this.props.name + 'is uninstalled.')
+    }
+  }
+
   install () {
     console.log('install for ' + this.props.name + ' clicked')
     if (chrome.app.isInstalled) {
@@ -72,6 +81,7 @@ class ExtensionStoreItem extends React.Component {
         <TextLabel theme={theme.extensionVersion} text={`version: ${this.props.version}`} />
         </header>
         <footer style={theme.extensionFooter}>
+        <PushButton color='secondary' onClick={this.uninstall}>Uninstall</PushButton>
         <PushButton color='primary' onClick={this.install}>Install</PushButton>
         </footer>
         </section>
