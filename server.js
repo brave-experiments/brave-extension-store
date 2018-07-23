@@ -10,7 +10,7 @@ var certOptions = {
 
 // Create a server with a host and port
 const server = Hapi.server({
-  host: process.env.LISTEN_ADDRESS || '127.0.0.1',
+  host: process.env.LISTEN_ADDRESS || 'localhost',
   port: process.env.PORT || 8080,
 })
 
