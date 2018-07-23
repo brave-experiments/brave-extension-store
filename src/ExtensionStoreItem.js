@@ -28,7 +28,7 @@ class ExtensionStoreItem extends React.Component {
       console.log('Already Installed!')
     } else {
       chrome.webstore.install(
-        'https://example.com/webstore/detail/' + this.props.id,
+        'https://extension-store-testing.herokuapp.com/webstore/detail/' + this.props.id,
         function () {
           console.log('Installed.')
         }, function (errorText) {
