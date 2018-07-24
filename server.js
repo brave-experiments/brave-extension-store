@@ -83,6 +83,7 @@ async function start () {
               uri: url
             }
           },
+          passThrough: true,
           redirects: 3
         }
       }
@@ -101,6 +102,7 @@ async function start () {
               uri: url
             }
           },
+          passThrough: true,
           redirects: 3
         }
       }
