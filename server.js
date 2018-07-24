@@ -90,6 +90,24 @@ async function start () {
 
     server.route({
       method: '*',
+      path: '/webstore/detail/{params*}',
+      handler: {
+        proxy: {
+          mapUri: function (request, callback) {
+            const extensionId = request.url.href.replace('/webstore/inlineinstall/detail/', '')
+            const url = remotes.url + '/webstore/inlineinstall/detail/' + extensionId
+            console.log('Proxying ' + request.url.href + ' to ' + url)
+            return {
+              uri: url
+            }
+          },
+          redirects: 3
+        }
+      }
+    })
+
+    server.route({
+      method: '*',
       path: '/' + remotes.path + '/{params*}',
       handler: {
         proxy: {
