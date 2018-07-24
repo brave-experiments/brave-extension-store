@@ -24,9 +24,9 @@ class ExtensionStoreItem extends React.Component {
 
   install () {
     console.log('install for ' + this.props.name + ' clicked')
-    if (chrome.app.isInstalled) {
-      console.log('Already Installed!')
-    } else {
+    //if (chrome.app.isInstalled) {
+    //  console.log('Already Installed!')
+    //} else {
       chrome.webstore.install(
         'https://extension-store-testing.herokuapp.com/webstore/detail/' + this.props.id,
         function () {
@@ -35,7 +35,7 @@ class ExtensionStoreItem extends React.Component {
           console.log('ERROR!\n' + errorText)
         }
       )
-    }
+    //}
   }
 
   render () {
