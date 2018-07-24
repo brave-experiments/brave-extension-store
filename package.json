@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "webpack",
     "server": "webpack && npm start",
-    "insecure-brave-from-source": "~/Documents/brave-browser/src/out/Release/Brave.app/Contents/MacOS/Brave  --enable-logging=stderr --apps-gallery-url=http://extension-store-testing.herokuapp/store --apps-gallery-download-url='http://extension-store-testing.herokuapp/brave-extension-store/%' --apps-gallery-update-url='http://extension-store-testing.herokuapp/brave-extension-store/%' --show-app-list --allow-insecure-localhost --reduce-security-for-testing --user-data-dir=/tmp/insecure_brave_test  --unsafely-treat-insecure-origin-as-secure=http://extension-store-testing.herokuapp/",
+    "insecure-brave-from-source": "~/Documents/brave-browser/src/out/Debug/Brave.app/Contents/MacOS/Brave  --enable-logging=stderr --apps-gallery-url=https://extension-store-testing.herokuapp.com/webstore --apps-gallery-download-url='https://extension-store-testing.herokuapp.com/webstore/%' --apps-gallery-update-url='https://extension-store-testing.herokuapp.com/webstore/%' --show-app-list --allow-insecure-localhost --reduce-security-for-testing --user-data-dir=/tmp/insecure_brave_test  --unsafely-treat-insecure-origin-as-secure=https://extension-store-testing.herokuapp.com/",
     "lint": "standard",
     "lintfix": "standard --fix"
   },
