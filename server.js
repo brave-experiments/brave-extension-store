@@ -58,7 +58,7 @@ async function start () {
     // Static content
     server.route({
       method: 'GET',
-      path: '/store',
+      path: '/webstore',
       handler: (request, h) => {
         return h.file('./src/storeList.html')
       }
@@ -102,7 +102,6 @@ async function start () {
               uri: url
             }
           },
-          passThrough: true,
           redirects: 3
         }
       }
@@ -111,7 +110,7 @@ async function start () {
     // used for static content (ex: images, JavaScript, etc)
     server.route({
       method: 'GET',
-      path: '/store/{param*}',
+      path: '/webstore/{param*}',
       handler: {
         directory: {
           path: 'src'
