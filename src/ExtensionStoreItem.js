@@ -1,7 +1,9 @@
+/* global chrome */
+
 'use strict'
 
 const React = require('react')
-const { Column, ButtonPrimary, TextLabel } = require('brave-ui')
+const { Column, PushButton, TextLabel } = require('brave-ui')
 
 class ExtensionStoreItem extends React.Component {
   constructor (props) {
@@ -70,19 +72,19 @@ class ExtensionStoreItem extends React.Component {
     }
 
     return (
-        <Column theme={theme.extensionBox} size={4}>
+      <Column theme={theme.extensionBox} size={4}>
         <section style={theme.extensionContent}>
-        <header style={theme.extensionMain}>
-        <TextLabel theme={theme.extensionTitle} text={this.props.name} />
-        <TextLabel theme={theme.extensionVersion} text={`version: ${this.props.version}`} />
-        </header>
-        <footer style={theme.extensionFooter}>
-        <ButtonPrimary color='secondary' onClick={this.uninstall}>Uninstall</ButtonPrimary>
-        <ButtonPrimary color='primary' onClick={this.install}>Install</ButtonPrimary>
-        </footer>
+          <header style={theme.extensionMain}>
+            <TextLabel theme={theme.extensionTitle} text={this.props.name} />
+            <TextLabel theme={theme.extensionVersion} text={`version: ${this.props.version}`} />
+          </header>
+          <footer style={theme.extensionFooter}>
+            <PushButton color='secondary' onClick={this.uninstall}>Uninstall</PushButton>
+            <PushButton color='primary' onClick={this.install}>Install</PushButton>
+          </footer>
         </section>
-        </Column>
-    )   
+      </Column>
+    )
   }
 }
 

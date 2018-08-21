@@ -1,7 +1,9 @@
+/* global XMLHttpRequest */
+
 'use strict'
 
 const React = require('react')
-const { Grid, Column, TitleHeading, ButtonPrimary} = require('brave-ui')
+const { Grid, Column, TitleHeading, PushButton } = require('brave-ui')
 const ExtensionStoreItem = require('./ExtensionStoreItem')
 const spinnerImage = require('./i/ajax-loader.gif')
 
@@ -91,42 +93,41 @@ class ExtensionStoreList extends React.Component {
 
     return <Grid theme={theme.pageGrid}>
       <Column>
-      <TitleHeading
-    text='Brave Extension Store'
-      />
+        <TitleHeading
+          text='Brave Extension Store'
+        />
       </Column>
       <Column theme={theme.extensionsWrapper}>
-      <Grid theme={theme.extensions}>
-      {
-        this.state.loading
-          ? <div><img src={spinnerImage} /> Loading...</div>
-          : this.state.extensions.map((extension) => {
-            return <ExtensionStoreItem
-            id={extension[0]}
-            version={extension[1]}
-            sha={extension[2]}
-            name={extension[3]}
-              />
-          })
-      } 
-    </Grid>
+        <Grid theme={theme.extensions}>
+          {
+            this.state.loading
+              ? <div><img src={spinnerImage} /> Loading...</div>
+              : this.state.extensions.map((extension) => {
+                return <ExtensionStoreItem
+                  id={extension[0]}
+                  version={extension[1]}
+                  sha={extension[2]}
+                  name={extension[3]}
+                />
+              })
+          }
+        </Grid>
       </Column>
       <Column>
-      <footer>
-      <ButtonPrimary color='brand' size='medium' onClick={this.fetchExtensions}>
+        <footer>
+          <PushButton color='brand' size='medium' onClick={this.fetchExtensions}>
       Refresh
-      </ButtonPrimary>
+          </PushButton>
 
-      <ButtonPrimary color='action' size='medium' onClick={this.checkForUpdates}>
+          <PushButton color='action' size='medium' onClick={this.checkForUpdates}>
       Check for updates
-      </ButtonPrimary>
+          </PushButton>
 
-      <div id='messages' />
-      </footer>
+          <div id='messages' />
+        </footer>
       </Column>
     </Grid>
   }
 }
-
 
 module.exports = ExtensionStoreList
