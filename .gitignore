@@ -2,3 +2,5 @@ node_modules
 dist
 src/storeList.bundle.js
 .DS_Store
+src/public/icons/bg_hearts.svg
+src/public/icons/bg_bats.svg
