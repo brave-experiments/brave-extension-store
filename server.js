@@ -31,7 +31,7 @@ server.route({
 
 server.route({
   method: 'GET',
-  path: '/brave-extension-store/{extensionId}',
+  path: '/webstore/{extensionId}',
   handler: function (request, h) {
     return extensions.find((extension) => {
       return extension.extensionId === request.params.extensionId

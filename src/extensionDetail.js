@@ -1,11 +1,11 @@
 'use strict'
 
 const React = require('react')
-const { Grid, Column, TitleHeading, ButtonPrimary} = require('brave-ui')
+const { Grid, Column, TitleHeading, ButtonPrimary } = require('brave-ui')
 const ExtensionStoreItem = require('./ExtensionStoreItem')
 const spinnerImage = require('./i/ajax-loader.gif')
 
-class ExtensionStoreList extends React.Component {
+class extensionDetail extends React.Component {
   constructor (props) {
     super()
     this.state = {
@@ -30,7 +30,6 @@ class ExtensionStoreList extends React.Component {
           const extensions = []
 
           response.extensions.forEach((extension) => {
-            // console.log('TEST: extension', extension)
             extensions.push(extension)
           })
 
@@ -47,37 +46,8 @@ class ExtensionStoreList extends React.Component {
     xmlhttp.send()
   }
 
-  checkForUpdates () {
-    var xmlhttp = new XMLHttpRequest()
-    const self = this
-
-    xmlhttp.onreadystatechange = function () {
-      if (xmlhttp.readyState === XMLHttpRequest.DONE) {
-        if (xmlhttp.status === 200) {
-          document.getElementById('messages').innerHTML = xmlhttp.response
-          // TODO: this.setState()
-          // ex: this.setState('extensions', xmlhtml)
-          self.setState({loading: false})
-        } else {
-          console.log('Request returned ' + xmlhttp.status)
-          self.setState({loading: false})
-        }
-      }
-    }
-
-    this.setState({loading: true})
-    xmlhttp.open('GET', '/brave-extension-store-update', true)
-    xmlhttp.send()
-  }
-
   render () {
-    const theme = {
-      pageGrid: {
-        backgroundColor: '#FBF5F3',
-        justifyContent: 'center',
-        gridGap: '15px',
-        padding: '15px'
-      },
+    const detailTheme = {
       extensionsWrapper: {
         flexDirection: 'column',
         justifyContent: 'center'
@@ -86,17 +56,49 @@ class ExtensionStoreList extends React.Component {
         maxWidth: '1200px',
         justifyContent: 'center',
         gridGap: '15px'
+      },
+      extensionBox: {
+        backgroundColor: '#fff',
+        maxWidth: '1000px',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '15px'
+      },
+      extensionContent: {
+        width: '-webkit-fill-available',
+        boxShadow: '1px 2px 2px 0px rgba(0,0,0,0.2)',
+        fontFamily: 'Helvetica Neue',
+        borderRadius: '5px',
+        minWidth: '33%'
+      },
+      extensionTitle: {
+        fontSize: '18px',
+        color: 'black',
+        padding: '0 0 5px'
+      },
+      extensionVersion: {
+        fontSize: '12px',
+        color: '#a0a0a0'
+      },
+      extensionMain: {
+        padding: '14px',
+        textTransform: 'uppercase'
+      },
+      extensionFooter: {
+        textAlign: 'right',
+        padding: '15px'
       }
     }
 
-    return <Grid theme={theme.pageGrid}>
+    return <Grid theme={theme.detailTheme}>
       <Column>
       <TitleHeading
-    text='Brave Extension Store'
+    text={extension[3]}
       />
       </Column>
       <Column theme={theme.extensionsWrapper}>
-      <Grid theme={theme.extensions}>
+      <Grid theme={theme.extensionBox}>
       {
         this.state.loading
           ? <div><img src={spinnerImage} /> Loading...</div>
@@ -104,7 +106,7 @@ class ExtensionStoreList extends React.Component {
             return <ExtensionStoreItem
             id={extension[0]}
             version={extension[1]}
-            sha={extension[2]}
+            description={extension[2]}
             name={extension[3]}
               />
           })
@@ -114,11 +116,7 @@ class ExtensionStoreList extends React.Component {
       <Column>
       <footer>
       <ButtonPrimary color='brand' size='medium' onClick={this.fetchExtensions}>
-      Refresh
-      </ButtonPrimary>
-
-      <ButtonPrimary color='action' size='medium' onClick={this.checkForUpdates}>
-      Check for updates
+        Close
       </ButtonPrimary>
 
       <div id='messages' />
@@ -129,4 +127,4 @@ class ExtensionStoreList extends React.Component {
 }
 
 
-module.exports = ExtensionStoreList
+module.exports = extensionDetail
