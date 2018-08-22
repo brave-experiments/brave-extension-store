@@ -1,3 +1,5 @@
+/* global chrome */
+
 'use strict'
 
 const React = require('react')
@@ -24,18 +26,14 @@ class ExtensionStoreItem extends React.Component {
 
   install () {
     console.log('install for ' + this.props.name + ' clicked')
-    //if (chrome.app.isInstalled) {
-    //  console.log('Already Installed!')
-    //} else {
-      chrome.webstore.install(
-        'https://extension-store-testing.herokuapp.com/webstore/detail/' + this.props.id,
-        function () {
-          console.log('Installed.')
-        }, function (errorText) {
-          console.log('ERROR!\n' + errorText)
-        }
-      )
-    //}
+    chrome.webstore.install(
+      'https://extension-store-testing.herokuapp.com/webstore/detail/' + this.props.id,
+      function () {
+        console.log('Installed.')
+      }, function (errorText) {
+        console.log('ERROR!\n' + errorText)
+      }
+    )
   }
 
   render () {
@@ -74,19 +72,19 @@ class ExtensionStoreItem extends React.Component {
     }
 
     return (
-        <Column theme={theme.extensionBox} size={4}>
+      <Column theme={theme.extensionBox} size={4}>
         <section style={theme.extensionContent}>
-        <header style={theme.extensionMain}>
-        <TextLabel theme={theme.extensionTitle} text={this.props.name} />
-        <TextLabel theme={theme.extensionVersion} text={`version: ${this.props.version}`} />
-        </header>
-        <footer style={theme.extensionFooter}>
-        <PushButton color='secondary' onClick={this.uninstall}>Uninstall</PushButton>
-        <PushButton color='primary' onClick={this.install}>Install</PushButton>
-        </footer>
+          <header style={theme.extensionMain}>
+            <TextLabel theme={theme.extensionTitle} text={this.props.name} />
+            <TextLabel theme={theme.extensionVersion} text={`version: ${this.props.version}`} />
+          </header>
+          <footer style={theme.extensionFooter}>
+            <PushButton color='secondary' onClick={this.uninstall}>Uninstall</PushButton>
+            <PushButton color='primary' onClick={this.install}>Install</PushButton>
+          </footer>
         </section>
-        </Column>
-    )   
+      </Column>
+    )
   }
 }
 

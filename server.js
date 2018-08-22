@@ -3,15 +3,10 @@
 const Hapi = require('hapi')
 const fs = require('fs')
 
-var certOptions = {
-  key: fs.readFileSync('./server-example.key'),
-  cert: fs.readFileSync('./server-example.crt')
-}
-
 // Create a server with a host and port
 const server = Hapi.server({
   host: process.env.LISTEN_ADDRESS || 'localhost',
-  port: process.env.PORT || 8080,
+  port: process.env.PORT || 8080
 })
 
 let extensions = []
@@ -59,6 +54,13 @@ async function start () {
     server.route({
       method: 'GET',
       path: '/webstore',
+      handler: (request, h) => {
+        return h.file('./src/storeList.html')
+      }
+    })
+    server.route({
+      method: 'GET',
+      path: '/webstore/',
       handler: (request, h) => {
         return h.file('./src/storeList.html')
       }

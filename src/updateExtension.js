@@ -63,10 +63,10 @@ const readExtensions = () => JSON.parse(fs.readFileSync(extensionManifestPath))
 
 // Components are all extensions plus some other things like Widevine
 const readComponentsForVersionUpgradesOnly = () => [...readExtensions(),
-                                                    // This should always be served from Google servers for licensing reasons
-                                                    // and this is only used for purposes of reporting.  We don't actually serve this file.
-                                                    [widevineComponentId, '1.4.8.903', '', 'Widevine']
-                                                   ]
+  // This should always be served from Google servers for licensing reasons
+  // and this is only used for purposes of reporting.  We don't actually serve this file.
+  [widevineComponentId, '1.4.8.903', '', 'Widevine']
+]
 
 /**
  * Extracts an array of components along with their version from response XML
@@ -82,25 +82,25 @@ const getResponseComponents = (responseXML) => {
     return undefined
   }
   const extensions = doc.childrenNamed('app')
-        .map((app) => {
-          const updatecheckManifest = app.descendantWithPath('updatecheck.manifest')
-          const updatecheckManifestPackages = app.descendantWithPath('updatecheck.manifest.packages.package')
+    .map((app) => {
+      const updatecheckManifest = app.descendantWithPath('updatecheck.manifest')
+      const updatecheckManifestPackages = app.descendantWithPath('updatecheck.manifest.packages.package')
 
-          return [
-            app.attr.appid,
-            updatecheckManifest && updatecheckManifest.attr.version,
-            updatecheckManifestPackages && updatecheckManifestPackages.attr.hash_sha256
-          ]
-        })
+      return [
+        app.attr.appid,
+        updatecheckManifest && updatecheckManifest.attr.version,
+        updatecheckManifestPackages && updatecheckManifestPackages.attr.hash_sha256
+      ]
+    })
   return extensions
 }
 
 const getExtensionServerBaseURL = () => {
   switch (args.server) {
-  case 'brave':
-    return braveUpdateServerBaseUrl
-  case 'local':
-    return localUpdateServerBaseUrl
+    case 'brave':
+      return braveUpdateServerBaseUrl
+    case 'local':
+      return localUpdateServerBaseUrl
   }
   return googleUpdateServerBaseUrl
 }
@@ -113,7 +113,7 @@ vlog(1, 'Using server:', getExtensionServerBaseURL())
 vlog(1, 'Using S3 bucket:', S3_EXTENSIONS_BUCKET)
 
 const getRequestBody = (chromiumVersion, components) =>
-      `<?xml version="1.0" encoding="UTF-8"?>
+  `<?xml version="1.0" encoding="UTF-8"?>
   <request protocol="3.0" version="chrome-${chromiumVersion}" prodversion="${chromiumVersion}" requestid="{b4f77b70-af29-462b-a637-8a3e4be5ecd9}" lang="" updaterchannel="stable" prodchannel="stable" os="mac" arch="x64" nacl_arch="x86-64">
     <hw physmemory="16"/>
     <os platform="Mac OS X" version="10.11.6" arch="x86_64"/>` +
@@ -139,7 +139,7 @@ const client = s3.createClient({
 const braveComponents = readComponentsForVersionUpgradesOnly()
 const components = braveComponents
 // Skip PDFJS since we maintain our own and Google doesn't know anything about it
-      .filter((component) => component[0] !== 'jdbefljfgobbmcidnmpjamcbhnbphjnb')
+  .filter((component) => component[0] !== 'jdbefljfgobbmcidnmpjamcbhnbphjnb')
 
 const body = getRequestBody(args.chromium, components)
 const mkdir = (path) => !fs.existsSync(path) && fs.mkdirSync(path)
@@ -194,7 +194,7 @@ const uploadFile = (filePath, componentId, componentFilename) => {
 }
 
 const writeExtensionsManifest = (componentData) =>
-      fs.writeFileSync(extensionManifestPath, JSON.stringify(componentData, null, 2) + '\n')
+  fs.writeFileSync(extensionManifestPath, JSON.stringify(componentData, null, 2) + '\n')
 
 // Check if we're only uploading an individual extension
 module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download, upload) => {
@@ -237,7 +237,7 @@ module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download,
 
       vlog(2, 'Response body:', body)
       let responseComponents = getResponseComponents(body)
-          .filter(([componentId]) => !args.id || componentId === args.id)
+        .filter(([componentId]) => !args.id || componentId === args.id)
       if (responseComponents.length === 0) {
         console.error('No component information returned')
       }
@@ -248,11 +248,11 @@ module.exports.updateExt = (extensionId, uploadPath, extensionVersion, download,
       // Add in the Brave info for each component
       vlog(1, 'Outdated components:\n--------------------')
       vlog(1, responseComponents.map((component) => [...component, ...braveComponents.find((braveComponent) => braveComponent[0] === component[0])])
-           .map((component) => [...component, ...braveComponents.find((braveComponent) => braveComponent[0] === component[0])])
-           // Filter out components with the same Brave versions as Google version
-           .filter((component) => component[1] !== component[4])
-           // And reduce to a string that we print out
-           .reduce((result, [componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => result + `Component: ${componentName} (${componentId})\nChrome store: ${chromeVersion}\nBrave store: ${braveVersion}\nSHA 256: ${chromeSHA256}\n\n`, ''))
+        .map((component) => [...component, ...braveComponents.find((braveComponent) => braveComponent[0] === component[0])])
+        // Filter out components with the same Brave versions as Google version
+        .filter((component) => component[1] !== component[4])
+        // And reduce to a string that we print out
+        .reduce((result, [componentId, chromeVersion, chromeSHA256, componentId2, braveVersion, braveSHA256, componentName]) => result + `Component: ${componentName} (${componentId})\nChrome store: ${chromeVersion}\nBrave store: ${braveVersion}\nSHA 256: ${chromeSHA256}\n\n`, ''))
 
       // Widevine components should not be attempted to be downloaded or uploaded, it is just for getting the version.
       // If you try it will just throw an error.

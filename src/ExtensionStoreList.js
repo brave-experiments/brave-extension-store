@@ -1,3 +1,5 @@
+/* global XMLHttpRequest */
+
 'use strict'
 
 const React = require('react')
@@ -91,43 +93,41 @@ class ExtensionStoreList extends React.Component {
 
     return <Grid theme={theme.pageGrid}>
       <Column>
-      <TitleHeading
-    text='Brave Extension Store'
-    label='beta'
-      />
+        <TitleHeading
+          text='Brave Extension Store'
+        />
       </Column>
       <Column theme={theme.extensionsWrapper}>
-      <Grid theme={theme.extensions}>
-      {
-        this.state.loading
-          ? <div><img src={spinnerImage} /> Loading...</div>
-          : this.state.extensions.map((extension) => {
-            return <ExtensionStoreItem
-            id={extension[0]}
-            version={extension[1]}
-            sha={extension[2]}
-            name={extension[3]}
-              />
-          })
-      } 
-    </Grid>
+        <Grid theme={theme.extensions}>
+          {
+            this.state.loading
+              ? <div><img src={spinnerImage} /> Loading...</div>
+              : this.state.extensions.map((extension) => {
+                return <ExtensionStoreItem
+                  id={extension[0]}
+                  version={extension[1]}
+                  sha={extension[2]}
+                  name={extension[3]}
+                />
+              })
+          }
+        </Grid>
       </Column>
       <Column>
-      <footer>
-      <PushButton color='secondary' onClick={this.fetchExtensions}>
+        <footer>
+          <PushButton color='brand' size='medium' onClick={this.fetchExtensions}>
       Refresh
-    </PushButton>
+          </PushButton>
 
-      <PushButton color='primary' onClick={this.checkForUpdates}>
+          <PushButton color='action' size='medium' onClick={this.checkForUpdates}>
       Check for updates
-    </PushButton>
+          </PushButton>
 
-      <div id='messages' />
-      </footer>
+          <div id='messages' />
+        </footer>
       </Column>
-      </Grid>
+    </Grid>
   }
 }
-
 
 module.exports = ExtensionStoreList

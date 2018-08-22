@@ -14,23 +14,23 @@
   "author": "Ailin Liao",
   "license": "ISC",
   "dependencies": {
-    "brave-ui": "^0.10.13",
+    "brave-ui": "^0.12.3",
     "h2o2": "^8.1.2",
-    "hapi": "^17.5.2",
+    "hapi": "^17.5.3",
     "https": "^1.0.0",
     "inert": "^5.1.0",
     "lint": "^1.1.2",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "request": "^2.87.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "request": "^2.88.0",
     "s3": "^4.4.0",
-    "sqlite3": "^3.1.13",
-    "xmldoc": "^1.1.0"
+    "sqlite3": "^4.0.2",
+    "xmldoc": "^1.1.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
+    "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.11",
@@ -38,9 +38,9 @@
     "pre-push": "^0.1.1",
     "standard": "^11.0.1",
     "style-loader": "^0.21.0",
-    "webpack": "^4.13.0",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-server": "^3.1.4"
+    "webpack": "^4.17.0",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
   },
   "pre-push": [
     "lint"
